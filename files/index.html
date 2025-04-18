@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <!-- Open Graph (for social media & Google previews) -->
+    <meta property="og:image" content="https://ectios.com/assets/favicon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ectios.com">
+    <meta property="og:title" content="Ectios - Smart Energy Solutions">
+    <meta property="og:description" content="Innovative solutions for a sustainable future">
+    <meta property="og:site_name" content="Ectios">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="script.js" defer></script>
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Ectios",
+          "logo": "https://ectios.com/assets/favicon.png",
+          "url": "https://www.ectios.com"
+        }
+        </script>
+</head>
+
+<body class="bg-gray-900 text-white">
+
+    <header
+        class="fixed top-0 left-0 w-full py-4 px-4 md:px-6 transition-all duration-300 ease-in-out bg-transparent z-50">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <img src="assets/logo-inv.svg" alt="ECTIOS" class="w-32 transition-all duration-300">
+        </div>
+    </header>
+
+    <!-- <main id="content" class="max-w-4xl mx-auto py-24 px-6">
+        <h1 class="text-4xl font-bold text-center">Loading...</h1>
+    </main> -->
+    <main>
+        <section class=" hero-section relative flex items-center justify-center h-screen bg-gray-950 parallax"
+            style="background-image: url('background-hero.jpg');">
+            <div class="absolute inset-0">
+                <canvas id="energyCanvas"></canvas>
+            </div>
+            <div class="relative z-10 text-center fade-in">
+                <h2 class="text-5xl md:text-6xl font-bold mb-4">Harnessing Solar Energy</h2>
+                <p class="text-xl md:text-2xl">Innovative solutions for a sustainable future</p>
+            </div>
+            <a id="scrollButton" href="#our-mission"
+                class="fixed bottom-4 md:bottom-6 w-12 h-12 flex items-center justify-center bg-black bg-opacity-50 rounded-full shadow-lg transition transform hover:scale-110 animate-bounce z-50">
+                <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
+                        id="scrollIcon" />
+                </svg>
+            </a>
+        </section>
+        <section id="our-mission" class="relative bg-gray-900 text-white text-center py-16 px-6 overflow-hidden">
+            <div class="absolute inset-0 bg-gray-900 opacity-30"></div>
+            <div class="absolute inset-0">
+                <img src="assets/bg-mission.svg" alt="Abstract Energy Background"
+                    class="w-full h-full object-cover opacity-10">
+            </div>
+            <div class="relative max-w-3xl mx-auto z-10">
+                <h2 class="text-4xl md:text-6xl font-bold mb-6">Our Mission</h2>
+                <p class="text-xl md:text-2xl mb-8">
+                    We believe in technology as a driver of sustainability.
+                    Our mission is to create digital solutions that optimize energy use
+                    and contribute to a more efficient and cleaner future.
+                </p>
+                <a href="https://www.linkedin.com/company/ectios" target="_blank" [class]="button"
+                    class="inline-block bg-blue-500 hover:bg-blue-600 text-white text-lg font-semibold py-3 px-6 rounded-full transition">
+                    Let’s Connect
+                </a>
+            </div>
+        </section>
+
+        <section class="bg-gray-950 text-white text-center py-16 px-6 fade-in">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-4xl md:text-6xl font-bold mb-10">Building Smarter Energy Solutions</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <article class="flex flex-col items-center glowing-border p-6 rounded-3xl bg-gray-900 fade-in">
+                        <div class="w-16 h-16 flex items-center justify-center bg-blue-500 rounded-full mb-4">
+                            <svg class="w-10 h-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-3-3v6m9 3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2">Energy Optimization</h3>
+                        <p class="text-lg text-gray-300">
+                            Data and AI-driven solutions to enhance energy efficiency.
+                        </p>
+                    </article>
+
+                    <article class="flex flex-col items-center glowing-border p-6 rounded-3xl bg-gray-900 fade-in">
+                        <div class="w-16 h-16 flex items-center justify-center bg-green-500 rounded-full mb-4">
+                            <svg class="w-10 h-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 10h11m-9 4h9m-6 4h6M5 6h14m2 4a2 2 0 00-2-2h-2.28a2 2 0 00-1.45.61l-1.24 1.24m-3.88-3.88L9 5m4 4h-1m-5 0H3m4-4l3 3m3 3l3 3m0 0l3 3m-6 0l-3 3" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2">Digital Platforms</h3>
+                        <p class="text-lg text-gray-300">
+                            Software solutions for smart energy management.
+                        </p>
+                    </article>
+
+                    <article class="flex flex-col items-center glowing-border p-6 rounded-3xl bg-gray-900 fade-in">
+                        <div class="w-16 h-16 flex items-center justify-center bg-yellow-500 rounded-full mb-4">
+                            <svg class="w-10 h-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5a1 1 0 012 0v1a1 1 0 01-2 0V5zm-3.293 3.293a1 1 0 011.414 0L12 10.586l2.879-2.879a1 1 0 111.414 1.414L13.414 12l2.879 2.879a1 1 0 11-1.414 1.414L12 13.414l-2.879 2.879a1 1 0 11-1.414-1.414L10.586 12 7.707 9.121a1 1 0 010-1.414z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2">Automation & Monitoring</h3>
+                        <p class="text-lg text-gray-300">
+                            IoT-driven technologies for real-time energy monitoring.
+                        </p>
+                    </article>
+
+                    <article class="flex flex-col items-center glowing-border p-6 rounded-3xl bg-gray-900 fade-in">
+                        <div class="w-16 h-16 flex items-center justify-center bg-purple-500 rounded-full mb-4">
+                            <svg class="w-10 h-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M20 12a8 8 0 11-16 0 8 8 0 0116 0zM12 8v4l3 3" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2">Scalability & Cloud</h3>
+                        <p class="text-lg text-gray-300">
+                            Serverless solutions for scalable energy data management.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="relative bg-gray-900 text-white py-16 px-6 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-gray-900 to-black opacity-50"></div>
+            <div class="absolute inset-0 backdrop-blur-lg"></div>
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-10 relative z-10">
+
+                <!-- Imagen -->
+                <div class="w-full md:w-1/2 rounded-3xl overflow-hidden shadow-2xl border border-blue-500/30">
+                    <img src="assets/feat-inno.png" alt="SolarBrio platform" class="w-full rounded-lg">
+                </div>
+
+                <!-- Texto -->
+                <div class="w-full md:w-1/2 text-center md:text-left">
+                    <h2 class="text-3xl md:text-5xl font-bold mb-2 text-white drop-shadow-lg">Featured Innovation</h2>
+                    <h3 class="text-4xl md:text-6xl font-semibold text-blue-400 mb-6">Solarbrio</h3>
+                    <p class="text-xl md:text-2xl mb-8 text-gray-300">
+                        Solarbrio is our advanced solar scouting platform,
+                        designed to streamline site selection and maximize energy potential.
+                        A step towards a smarter, data-driven energy future.
+                    </p>
+                    <a href="https://solarbrio.com" target="_blank"
+                        class="inline-block bg-blue-500 hover:bg-blue-600 text-white text-lg font-semibold py-3 px-6 rounded-full transition transform hover:scale-105 shadow-lg">
+                        Learn More
+                    </a>
+                </div>
+
+            </div>
+        </section>
+        <section class="about-us-section relative py-16 px-6 overflow-hidden">
+            <!-- Background Overlay with Gradient and Pattern -->
+            <div class="absolute inset-0 bg-gradient-to-bl from-blue-900 via-gray-900 to-black opacity-60"></div>
+            <div class="absolute inset-0">
+                <svg class="w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 600"
+                    preserveAspectRatio="none">
+                    <defs>
+                        <pattern id="hexagons" patternUnits="userSpaceOnUse" width="40" height="35">
+                            <polygon points="20,0 40,10 40,25 20,35 0,25 0,10" stroke="#3B82F6" stroke-width="1"
+                                fill="none" />
+                        </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#hexagons)" />
+                </svg>
+            </div>
+
+            <!-- Content Container -->
+            <article
+                class="relative max-w-4xl mx-auto text-center bg-gray-900 text-white p-10 rounded-3xl fade-in shadow-xl border border-blue-500/30">
+                <h2 class="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg">Who We Are</h2>
+                <p class="text-xl md:text-2xl mb-8 text-gray-300">
+                    At <strong>Ectios</strong>, we believe in technology as a key driver for a sustainable energy
+                    future.
+                    Our team is dedicated to developing digital solutions that optimize energy efficiency
+                    and empower decision-making in the renewable sector.
+                </p>
+
+                <a href="mailto:connect@ectios.com"
+                    class="inline-block bg-blue-500 hover:bg-blue-600 text-white text-lg font-semibold py-3 px-6 rounded-full transition transform hover:scale-105 shadow-lg">
+                    Let’s Talk
+                </a>
+            </article>
+        </section>
+    </main>
+    <footer class="bg-gray-900 text-white text-center py-8">
+        <div class="max-w-4xl mx-auto">
+
+            <!-- Logo -->
+            <img src="assets/logo-inv.svg" alt="ECTIOS" class="w-36 mx-auto mb-4">
+
+            <!-- Links Section -->
+            <nav class="flex justify-center space-x-4 text-gray-400 mb-4">
+                <!-- <a href="#home" class="hover:text-white transition">Home</a> -->
+                <a href="#" data-modal="privacy.html"
+                    class="hover:text-white transition">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Privacy
+                    Policy</a>
+                <span class="text-gray-500">•</span>
+                <a href="#terms" class="hover:text-white transition">Terms of Service</a>
+            </nav>
+
+            <!-- Social Media Links -->
+            <div class="flex justify-center space-x-6 mb-4 ">
+                <a href="mailto:connect@ectios.com" class="text-gray-400 hover:text-white hover:scale-110 transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4.8l-8 5-8-5V6l8 5 8-5v2.8z" />
+                    </svg>
+                </a>
+                <a href="https://www.linkedin.com/company/ectios" target="_blank"
+                    class="text-gray-400 hover:text-white hover:scale-110 transition">
+                    <!-- <img src="assets/icons/linkedin.svg" class="w-7 h-7" alt="LinkedIn"> -->
+                    <svg class="w-5 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.28c-.97 0-1.75-.79-1.75-1.75s.79-1.75 1.75-1.75c.97 0 1.75.79 1.75 1.75s-.78 1.75-1.75 1.75zm13.5 11.28h-3v-5.5c0-1.33-.03-3.05-1.87-3.05-1.87 0-2.16 1.46-2.16 2.96v5.59h-3v-10h2.88v1.37h.04c.4-.75 1.38-1.54 2.84-1.54 3.03 0 3.59 2 3.59 4.59v5.58z" />
+                    </svg>
+                </a>
+                <a class="text-gray-400 hover:text-white hover:scale-110 transition">
+                    <svg class="w-5 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M17.36 2H21L13.06 10.77L22 22H15.97L10.61 15.31L4.94 22H1.31L9.86 12.64L1 2H7.14L12.96 8.96L17.36 2ZM16.19 19.93H17.83L6.42 4.06H4.67L16.19 19.93Z" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Copyright -->
+            <p class="text-sm text-gray-500">
+                &copy; 2025 Ectios. All rights reserved.
+            </p>
+        </div>
+    </footer>
+    <!-- Modal Overlay -->
+    <dialog id="modalOverlay"
+        class="fixed inset-0 w-100 bg-black bg-opacity-50 invisible flex items-center justify-center z-50">
+        <div class="bg-gray-900 text-white max-w-2xl p-6 rounded-lg shadow-lg relative">
+            <!-- Close Button -->
+            <button id="closeModal"
+                class="absolute top-2 right-2 text-gray-400 hover:text-white text-2xl">&times;</button>
+            <!-- Content Will be Loaded Here -->
+            <div id="modalContent" class="max-h-[80vh] overflow-auto"></div>
+        </div>
+    </dialog>
+</body>
+
+</html>

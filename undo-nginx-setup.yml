@@ -1,0 +1,44 @@
+---
+- name: Revert basic server setup
+  hosts: webservers
+  become: yes
+
+  vars:
+    old_user: pumejEmeka
+
+  tasks:
+    - name: Stop and disable nginx service
+      service:
+        name: nginx
+        state: stopped
+        enabled: no
+
+    - name: Remove installed packages
+      package:
+        name:
+          - htop
+          - nginx
+        state: absent
+
+    - name: Delete custom index.html
+      file:
+        path: /usr/share/nginx/html/index.html
+        state: absent
+
+    - name: Remove user and home directory
+      user:
+        name: "{{ old_user }}"
+        state: absent
+        remove: yes
+
+    - name: Remove HTTP service from firewalld
+      ansible.posix.firewalld:
+        service: http
+        state: disabled
+        permanent: yes
+        immediate: yes
+      when: ansible_facts['os_family'] == "RedHat"
+      
+    - name: Reload firewalld
+      command: firewall-cmd --reload
+      when: ansible_facts['os_family'] == "RedHat"

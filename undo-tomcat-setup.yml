@@ -1,0 +1,72 @@
+# This is an Apache Tomcat Server set up file. 
+
+---
+- name: Apache Tomcat - Basic Server Setup
+  hosts: webservers
+  become: yes
+
+  vars:
+    new_user: pumejEmeka
+    ssh_key_path: "/home/pumej/.ssh/id_ed25519.pub"
+    tomcat_root_path: "/usr/share/tomcat/webapps/ROOT"
+
+  tasks:
+    - name: Ensure EPEL is installed (for CentOS)
+      yum:
+        name: epel-release
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Remove Tomcat
+      yum:
+        name:
+          - tomcat
+          - tomcat-webapps
+          - tomcat-admin-webapps
+        state: absent
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Remove ssh key for new user
+      authorized_key:
+        user: "{{ new_user }}"
+        state: absent
+        key: "{{ lookup('file', ssh_key_path) }}"
+
+    - name: Remove new User created
+      user:
+        name: "{{ new_user }}"
+        state: absent
+        shell: /bin/bash
+
+    - name: Ensure Tomcat is not running and not enabled
+      service:
+        name: tomcat
+        state: stopped
+        enabled: no
+
+    - name: Close/Disable HTTP port in firewalld
+      firewalld:
+        port: 8080/tcp
+        permanent: yes
+        state: disabled
+        immediate: yes
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Reload firewalld
+      command: firewall-cmd --reload
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Remove index.html from Tomcat ROOT
+      file:
+        path: "{{ tomcat_root_path }}/index.html"
+        state: absent
+
+    - name: Remove Tomcat ROOT directory if it exists
+      file:
+        path: "{{ tomcat_root_path }}"
+        state: absent
+
+    # - name: Restart Tomcat
+    #   service:
+    #     name: tomcat
+    #     state: restarted

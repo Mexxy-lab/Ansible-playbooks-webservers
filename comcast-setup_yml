@@ -1,0 +1,39 @@
+# Comcast install on an Ubuntu server
+
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: Ensure git is installed
+      yum:
+        name: git
+        state: present
+
+    - name: Ensure make is installed
+      yum:
+        name: make
+        state: present
+
+    - name: Ensure Go is installed
+      yum:
+        name: golang
+        state: present
+
+    - name: Remove existing Comcast directory if it exists
+      file:
+        path: '/opt/comcast'
+        state: absent
+
+    - name: Clone Comcast GitHub repository
+      git:
+        repo: 'https://github.com/tylertreat/comcast.git'
+        dest: '/opt/comcast'
+
+    - name: Download Go modules
+      command: go mod download
+      args:
+        chdir: /opt/comcast
+
+    - name: Build and install Comcast
+      command: /usr/bin/gmake
+      args:
+        chdir: /opt/comcast

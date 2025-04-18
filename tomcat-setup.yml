@@ -1,0 +1,76 @@
+# This is an Apache Tomcat Server set up file. 
+
+---
+- name: Apache Tomcat - Basic Server Setup
+  hosts: webservers
+  become: yes
+
+  vars:
+    new_user: pumejEmeka
+    ssh_key_path: "/home/pumej/.ssh/id_ed25519.pub"
+    tomcat_root_path: "/usr/share/tomcat/webapps/ROOT"
+
+  tasks:
+    - name: Ensure EPEL is installed (for CentOS)
+      yum:
+        name: epel-release
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Install Tomcat
+      yum:
+        name:
+          - tomcat
+          - tomcat-webapps
+          - tomcat-admin-webapps
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Create a new user
+      user:
+        name: "{{ new_user }}"
+        state: present
+        shell: /bin/bash
+
+    - name: Set up SSH key for the new user
+      authorized_key:
+        user: "{{ new_user }}"
+        state: present
+        key: "{{ lookup('file', ssh_key_path) }}"
+
+    - name: Ensure Tomcat is running and enabled
+      service:
+        name: tomcat
+        state: started
+        enabled: yes
+
+    - name: Open HTTP port in firewalld
+      firewalld:
+        port: 8080/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Reload firewalld
+      command: firewall-cmd --reload
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Ensure Tomcat ROOT directory exists
+      file:
+        path: "{{ tomcat_root_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Copy custom index.html to Tomcat ROOT
+      copy:
+        src: files/index.html
+        dest: "{{ tomcat_root_path }}/index.html"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart Tomcat
+      service:
+        name: tomcat
+        state: restarted

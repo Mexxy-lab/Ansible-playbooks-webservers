@@ -1,0 +1,72 @@
+# This play book would 
+
+# -Install htop and nginx
+
+# Create a new user
+
+# Set up SSH access for the new user
+
+# Start and enable nginx
+
+# Deploy an HTML file to /usr/share/nginx/html/index.html
+
+---
+- name: Basic server setup
+  hosts: webservers
+  become: yes
+
+  vars:
+    new_user: pumejEmeka
+    ssh_key_path: "/home/pumej/.ssh/id_ed25519.pub"
+
+  tasks:
+    - name: Ensure EPEL is installed (for CentOS)
+      yum:
+        name: epel-release
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Install packages
+      package:
+        name:
+          - htop
+          - httpd
+        state: present
+
+    - name: Create a new user
+      user:
+        name: "{{ new_user }}"
+        state: present
+        shell: /bin/bash
+
+    - name: Set up SSH key for the new user
+      authorized_key:
+        user: "{{ new_user }}"
+        state: present
+        key: "{{ lookup('file', ssh_key_path) }}"
+
+    - name: Ensure httpd is running and enabled
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Open HTTP port in firewalld
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+        immediate: yes
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Reload firewalld
+      command: firewall-cmd --reload
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Copy custom index.html to Apache web root
+      copy:
+        src: files/index.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'

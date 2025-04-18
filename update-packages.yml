@@ -1,0 +1,15 @@
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: Update all packages on Debian-based systems
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Update all packages on RedHat-based systems
+      yum:
+        name: '*'
+        state: latest
+      when: ansible_os_family == 'RedHat'
+
