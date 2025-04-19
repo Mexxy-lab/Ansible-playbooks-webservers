@@ -1,0 +1,64 @@
+---
+- name: Install Terraform and Docker on CentOS/RHEL
+  hosts: jenkinsserver
+  become: true
+  vars:
+    terraform_version: "1.7.5"
+    ansible_user: "pumej"
+
+  tasks:
+    - name: Install required system packages
+      yum:
+        name:
+          - yum-utils
+          - curl
+          - unzip
+          - gnupg
+        state: present
+
+    # -----------------------
+    # Install Terraform
+    # -----------------------
+
+    - name: Add HashiCorp repo
+      get_url:
+        url: https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+        dest: /etc/yum.repos.d/hashicorp.repo
+
+    - name: Install Terraform
+      yum:
+        name: terraform
+        state: present
+        update_cache: yes
+
+    # -----------------------
+    # Install Docker
+    # -----------------------
+
+    - name: Add Docker CE repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install Docker Engine
+      yum:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+
+    - name: Start and enable Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
