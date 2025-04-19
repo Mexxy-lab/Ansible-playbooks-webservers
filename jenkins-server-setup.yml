@@ -1,0 +1,60 @@
+---
+- name: Deploy Jenkins on CentOS VM server
+  hosts: jenkinsserver
+  become: yes
+
+  tasks:
+    - name: Install Java 17 and development tools
+      yum:
+        name:
+          - java-17-openjdk
+          - java-17-openjdk-devel
+        state: present
+
+    - name: Add Jenkins repo
+      get_url:
+        url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+
+    - name: Import Jenkins GPG key
+      rpm_key:
+        state: present
+        key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+
+    - name: Install Jenkins
+      yum:
+        name: jenkins
+        state: present
+
+    - name: Start and enable Jenkins
+      service:
+        name: jenkins
+        state: started
+        enabled: yes
+
+    - name: Open port 8080 in firewalld
+      firewalld:
+        port: 8080/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Reload firewalld
+      command: firewall-cmd --reload
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Wait for Jenkins to start (30s max)
+      wait_for:
+        port: 8080
+        state: started
+        timeout: 30
+
+    - name: Print initial Jenkins admin password
+      command: cat /var/lib/jenkins/secrets/initialAdminPassword
+      register: jenkins_admin_pass
+      changed_when: false
+
+    - name: Show Jenkins initial admin password
+      debug:
+        msg: "Jenkins initial admin password is: {{ jenkins_admin_pass.stdout }}"
