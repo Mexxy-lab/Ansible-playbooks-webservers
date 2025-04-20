@@ -4,11 +4,11 @@
   become: yes
 
   tasks:
-    - name: Install Java 17 and development tools
+    - name: Install Java 21 and development tools
       yum:
         name:
-          - java-17-openjdk
-          - java-17-openjdk-devel
+          - java-21-openjdk
+          - java-21-openjdk-devel
         state: present
 
     - name: Add Jenkins repo
