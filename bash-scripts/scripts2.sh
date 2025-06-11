@@ -66,7 +66,7 @@ done
 
 echo "✅ All users created and configured."
 
-# 2) - Problem: Write a script to automate a task, such as: A script to fetch data from files or directories process them and perform an action 
+# 3) - Problem: Write a script to automate a task, such as: A script to fetch data from files or directories process them and perform an action 
 
 #!/bin/bash
 

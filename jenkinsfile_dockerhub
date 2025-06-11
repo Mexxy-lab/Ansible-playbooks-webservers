@@ -1,0 +1,99 @@
+pipeline {
+    agent any
+
+    environment {
+        SONAR_AUTH_TOKEN = credentials('sonar-token')
+        SONAR_AUTH_TOKEN2 = credentials('sonar-token2')
+        DOCKERHUB_CREDENTIALS = credentials('pumej-dockerhubtoken')
+        IMAGE = 'django-backend'
+        REPO_NAME = 'pumejlab'
+        DIRECTORY = 'django-backend'
+    }
+
+    stages {
+        stage('SCM Checkout') {
+            steps{
+           git branch: 'main', url: 'https://github.com/Mexxy-lab/Django-multitier-application-deployment.git'
+            }
+        }
+        // Server is ran in docker         
+        stage('SonarQube Analysis on Docker') {
+            steps {
+                dir(env.DIRECTORY) {
+                    withSonarQubeEnv('sonar') {
+                        sh '''
+                            echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin
+                            docker run --rm \
+                                -e SONAR_HOST_URL=$SONAR_HOST_URL \
+                                -e SONAR_TOKEN=$SONAR_AUTH_TOKEN \
+                                -v $(pwd):/usr/src \
+                                sonarsource/sonar-scanner-cli \
+                                -Dsonar.projectKey=django-backend \
+                                -Dsonar.sources=/usr/src
+                        '''
+                    }
+                }
+            }
+        }
+        // When Sonarqube server is ran on VM host where sonarqube is installed!!!
+        stage('SonarQube Analysis on Local') {
+            steps {
+                withSonarQubeEnv('sonar2') {
+                sh '''
+                    sonar-scanner \
+                    -Dsonar.projectKey=django-backend \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=$SONAR_HOST_URL \
+                    -Dsonar.login=$SONAR_AUTH_TOKEN2
+                '''
+                }
+            } 
+        }          
+        stage('Docker Build') {
+            steps {
+                script {
+                    dir(env.DIRECTORY) {
+                        sh """
+                        docker build -t ${env.REPO_NAME}/${env.IMAGE}:${env.BUILD_NUMBER} .
+                        """
+                    }
+                }
+            }
+        }
+        stage('Login to dockerhub') {
+            steps{
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
+        stage('Trivy Scan (Aqua)') {
+            steps {
+                script {
+                    sh '''
+                    echo "🔍 Running Trivy vulnerability scan..."
+                    
+                    # Run Trivy with severity filter and a timeout
+                    trivy image \
+                      --scanners vuln \
+                      --severity HIGH,CRITICAL \
+                      --timeout 10m \
+                      $REPO_NAME/$IMAGE:$BUILD_NUMBER
+                    '''
+                }
+            }
+        }
+        stage('Push image to DockerHub') {
+            steps{
+                sh 'docker push $REPO_NAME/$IMAGE:$BUILD_NUMBER'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Docker image pushed: ${env.REPO_NAME}/${env.IMAGE}:${env.BUILD_NUMBER}"
+        }
+        failure {
+            echo "Build or push failed."
+        }
+    }
+}

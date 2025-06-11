@@ -1,0 +1,86 @@
+pipeline {
+    agent any
+
+    options {
+        timeout(time: 15, unit: 'MINUTES') // Slightly increased for safety
+    }
+
+    environment {
+        AWS_REGION = "ap-south-1"
+        AWS_ACCESS_KEY_ID     = credentials('pumej_aws_access_id')
+        AWS_SECRET_ACCESS_KEY = credentials('pumej_aws_secret_key')
+        ECR_NAME = "pumejrepo"
+        registryUrl = "598189530267.dkr.ecr.ap-south-1.amazonaws.com"
+    }
+
+    stages {
+        stage('SCM Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Mexxy-lab/Pumej_amazon-clone-app.git'
+            }
+        }
+        stage('Set Image Tag') {
+            steps {
+                script {
+                    env.IMAGE_TAG = "v${env.BUILD_NUMBER}.0"
+                }
+            }
+        }         
+
+        stage('Docker Build') {
+            steps {
+                sh """
+                    docker build --network=host -t ${registryUrl}/${ECR_NAME}:${IMAGE_TAG} .
+                """
+            }
+        }
+
+        stage('Login to ECR') {
+            steps {
+                sh """
+                    echo "🔑 Logging into Amazon ECR..."
+                    aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+                    aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+                    aws configure set region ${AWS_REGION}
+                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${registryUrl}
+                """
+            }
+        }
+
+        stage('Trivy Scan (Aqua)') {
+            steps {
+                sh """
+                    echo "🔍 Running Trivy vulnerability scan..."
+                    trivy image \
+                      --scanners vuln \
+                      --severity HIGH,CRITICAL \
+                      --timeout 10m \
+                      ${registryUrl}/${ECR_NAME}:${IMAGE_TAG}
+                """
+            }
+        }
+
+        stage('Push Docker Image to ECR') {
+            steps {
+                sh """
+                    echo "🚀 Pushing Docker image to Amazon ECR..."
+                    docker push ${registryUrl}/${ECR_NAME}:${IMAGE_TAG}
+                """
+            }
+        }
+
+        stage('Trigger ManifestUpdate') {
+            steps {
+                build job: 'argocd-manifest-amazon', parameters: [
+                    string(name: 'DOCKERTAG', value: "${IMAGE_TAG}")
+                ]
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "✅ Build Deployed Successfully, downstream job triggered!"
+        }
+    }
+}
