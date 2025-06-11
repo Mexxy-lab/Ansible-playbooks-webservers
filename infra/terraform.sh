@@ -29,9 +29,9 @@ else
   echo "🧩 Planning changes..."
   terraform plan -out=tfplan
 
-#   echo "🛠️  Applying infrastructure..."
-#   terraform apply -auto-approve tfplan
+  echo "🛠️  Applying infrastructure..."
+  terraform apply -auto-approve tfplan
 
-#   echo "🌐 Public IP:"
-#   terraform output instance_public_ip
+  echo "🌐 Public IP:"
+  terraform output instance_public_ip
 fi

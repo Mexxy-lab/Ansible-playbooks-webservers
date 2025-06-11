@@ -66,3 +66,38 @@ done
 
 echo "✅ All users created and configured."
 
+# 2) - Problem: Write a script to automate a task, such as: A script to fetch data from files or directories process them and perform an action 
+
+#!/bin/bash
+
+# Set default log directory or use provided argument
+LOG_DIR="${1:-/var/log}"
+SUMMARY_FILE="/tmp/log_summary_$(date +%F_%H-%M-%S).txt"
+
+echo "📁 Scanning log files in: $LOG_DIR"
+echo "🧾 Writing summary to: $SUMMARY_FILE"
+echo "==== Log Summary (Errors Only) ====" > "$SUMMARY_FILE"
+
+found_errors=false
+
+# Find .log files in directory
+find "$LOG_DIR" -type f -name "*.log" | while read -r logfile; do
+    error_count=$(grep -i "error" "$logfile" | wc -l)
+    if [ "$error_count" -gt 0 ]; then
+        echo "🔴 $logfile - $error_count error(s)" >> "$SUMMARY_FILE"
+        grep -i "error" "$logfile" >> "$SUMMARY_FILE"
+        echo "-------------------------------------" >> "$SUMMARY_FILE"
+        found_errors=true
+    fi
+done
+
+# Final action
+if [ "$found_errors" = true ]; then
+    echo "✅ Errors found. Summary:"
+    cat "$SUMMARY_FILE"
+
+    # Optional: send via email
+    # mail -s "Log Error Summary" you@example.com < "$SUMMARY_FILE"
+else
+    echo "✅ No errors found in any logs."
+fi
