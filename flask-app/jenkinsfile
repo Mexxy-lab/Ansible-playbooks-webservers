@@ -1,0 +1,70 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "your-dockerhub-user/flask-ci"
+    }
+
+    stages {
+        stage('Clone Repo') {
+            steps {
+                git 'https://github.com/your-org/flask-app.git'
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                sh 'pip install -r requirements.txt'
+                sh 'pytest'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $IMAGE_NAME:$BUILD_NUMBER .'
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerhub-token', variable: 'DOCKER_TOKEN')]) {
+                    sh "echo $DOCKER_TOKEN | docker login -u your-dockerhub-user --password-stdin"
+                    sh 'docker push $IMAGE_NAME:$BUILD_NUMBER'
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                dir('infra') {
+                    withCredentials([file(credentialsId: 'aws-private-key', variable: 'AWS_KEY')]) {
+                        sh '''
+                            terraform init
+                            terraform apply -auto-approve \
+                                -var="key_name=your-key" \
+                                -var="private_key_path=$AWS_KEY"
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to EC2') {
+            steps {
+                script {
+                    def ec2_ip = sh(
+                        script: "terraform -chdir=infra output -raw public_ip",
+                        returnStdout: true
+                    ).trim()
+
+                    sshagent (credentials: ['ec2-ssh-cred']) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@${ec2_ip} \\
+                        'docker pull $IMAGE_NAME:$BUILD_NUMBER && docker run -d -p 5000:5000 $IMAGE_NAME:$BUILD_NUMBER'
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
