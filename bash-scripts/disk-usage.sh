@@ -2,15 +2,15 @@
 
 # Script to monitor disk usage and alert when usage exceeds 80%.
 
-# threshold=80
-# df -H | grep '^/dev' | while read line; do
-#   usage=$(echo $line | awk '{ print $5 }' | sed 's/%//g')
-#   partition=$(echo $line | awk '{ print $1 }')
-#   if [ "$usage" -gt "$threshold" ]; then
-#     echo "Alert: $partition is $usage% full"
-#     # Send email/slack notification logic here
-#   fi
-# done
+threshold=80
+df -H | grep '^/dev' | while read line; do
+  usage=$(echo $line | awk '{ print $5 }' | sed 's/%//g')
+  partition=$(echo $line | awk '{ print $1 }')
+  if [ "$usage" -gt "$threshold" ]; then
+    echo "Alert: $partition is $usage% full"
+    # Send email/slack notification logic here
+  fi
+done
 
 threshold=80
 df -H | grep '^/dev' | while read line; do

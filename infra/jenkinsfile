@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'us-east-1'
+        AMI_ID = 'ami-0c55b159cbfafe1f0'
+        INSTANCE_TYPE = 't2.micro'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/your-org/your-repo.git'
+            }
+        }
+
+        stage('Terraform Init & Apply') {
+            steps {
+                sh './infra/terraform.sh'
+            }
+        }
+
+        stage('Output Public IP') {
+            steps {
+                sh 'terraform output instance_public_ip'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo '✅ Pipeline finished.'
+        }
+        failure {
+            echo '❌ Something went wrong.'
+        }
+    }
+}
