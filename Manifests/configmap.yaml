@@ -7,12 +7,35 @@ data:
 
 
 ---
+# This would create 2 secrets 
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+type: Opaque
+stringData:
+  DB_PASSWORD: "password123"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: api-secret
+type: Opaque
+stringData:
+  API_KEY: "abcdef12345"
+
+
+---
+# This creates one secret named app-secret with 3 key-value pairs.
 apiVersion: v1
 kind: Secret
 metadata:
   name: app-secret
+type: Opaque
 stringData:
   DB_PASSWORD: "password123"
+  DB_USER: "admin"
+  API_KEY: "abcdef12345"
 
 
 ---
