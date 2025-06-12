@@ -1,69 +1,28 @@
+---
+# This creates one ConfigMap named app-config with 3 key-value pairs.
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: app-config
 data:
   ENV: "production"
+  LOG_LEVEL: "info"
+  TIMEOUT: "30"
 
 
 ---
-# This would create 2 secrets 
+# This creates two separate ConfigMaps: app-config and db-config.
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
-  name: db-secret
-type: Opaque
-stringData:
-  DB_PASSWORD: "password123"
+  name: app-config
+data:
+  ENV: "production"
 ---
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
-  name: api-secret
-type: Opaque
-stringData:
-  API_KEY: "abcdef12345"
-
-
----
-# This creates one secret named app-secret with 3 key-value pairs.
-apiVersion: v1
-kind: Secret
-metadata:
-  name: app-secret
-type: Opaque
-stringData:
-  DB_PASSWORD: "password123"
-  DB_USER: "admin"
-  API_KEY: "abcdef12345"
-
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: secure-app
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: secure-app
-  template:
-    metadata:
-      labels:
-        app: secure-app
-    spec:
-      containers:
-      - name: secure-app
-        image: myapp
-        env:
-        - name: ENV
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: ENV
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: app-secret
-              key: DB_PASSWORD
+  name: db-config
+data:
+  DB_HOST: "localhost"
+  DB_PORT: "5432"
