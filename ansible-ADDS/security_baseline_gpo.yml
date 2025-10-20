@@ -1,0 +1,61 @@
+---
+- name: Create and apply Security Baseline GPO
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Ensure Group Policy module is available
+      ansible.windows.win_feature:
+        name: GPMC
+        state: present
+        include_management_tools: yes
+
+    - name: Create Security Baseline GPO
+      community.windows.win_gpo:
+        name: "Server Security Baseline"
+        state: present
+        domain_username: "Administrator"
+        domain_password: "Emekulus@1234"
+        domain_server: "pumejlab.pumej.com"
+
+    - name: Link GPO to the Servers OU
+      community.windows.win_gpo_link:
+        name: "Server Security Baseline"
+        path: "OU=Servers,OU=PumejHQ,DC=pumej,DC=com"
+        state: present
+        enforced: yes
+
+    # Example Security Settings
+    - name: Set Account Lockout Policy
+      community.windows.win_gpo_setting:
+        gpo: "Server Security Baseline"
+        name: "Account lockout threshold"
+        section: "Security"
+        option: "LockoutBadCount"
+        value: 5
+
+    - name: Set Password Policy - Minimum Length
+      community.windows.win_gpo_setting:
+        gpo: "Server Security Baseline"
+        name: "Minimum password length"
+        section: "Security"
+        option: "MinimumPasswordLength"
+        value: 12
+
+    - name: Enable Audit Logon Events
+      community.windows.win_gpo_setting:
+        gpo: "Server Security Baseline"
+        name: "Audit logon events"
+        section: "Security"
+        option: "AuditLogonEvents"
+        value: "Success,Failure"
+
+    - name: Disable Remote Desktop for non-admins
+      community.windows.win_gpo_script:
+        gpo: "Server Security Baseline"
+        script:
+          type: startup
+          name: "disable_rdp_non_admins.ps1"
+          content: |
+            $rdpGroup = "Remote Desktop Users"
+            Get-LocalGroupMember -Group $rdpGroup | Where-Object { $_.Name -notmatch "Administrators" } | ForEach-Object { Remove-LocalGroupMember -Group $rdpGroup -Member $_.Name }

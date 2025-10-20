@@ -1,0 +1,25 @@
+---
+- name: Configure DNS Server
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Install DNS Server feature
+      ansible.windows.win_feature:
+        name: DNS
+        state: present
+        include_management_tools: yes
+
+    - name: Create a DNS forward lookup zone
+      community.windows.win_dns_zone:
+        name: "pumej.com"
+        type: primary
+        dynamic_update: "Secure"
+        state: present
+
+    - name: Add a DNS A record for mail server
+      community.windows.win_dns_record:
+        name: "mail"
+        type: "A"
+        value: "192.168.50.110"
+        zone: "pumej.com"
+        state: present

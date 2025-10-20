@@ -1,0 +1,30 @@
+---
+- name: Manage Active Directory users
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Create a new AD user account
+      microsoft.ad.user:
+        firstname: "John"
+        lastname: "Doe"
+        display_name: "John Doe"
+        identity: "john"
+        sam_account_name: "john"
+        upn: "john@pumej.com"
+        password: "Emekulus@1234"
+        domain_server: "pumejlab.pumej.com"
+        update_password: always
+        country: "US"
+        state: present
+        city: "Jacksonville"
+        user_cannot_change_password: yes
+        account_locked: no
+        description: "IT Department User"
+        password_never_expires: yes
+        enabled: yes
+        path: "OU=IT organisation,OU=Employees,OU=PumejHQ,DC=pumej,DC=com"
+        domain_username: "Administrator@pumej.com"
+        domain_password: "Emekulus@1234"
+
+
+

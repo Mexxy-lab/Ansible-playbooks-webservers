@@ -1,0 +1,57 @@
+## Inventory file for HTTP connection to DC.
+
+# all:
+#   hosts:
+#     Pumejlab:
+#       ansible_host: 192.168.1.107
+#       ansible_user: "Administrator@pumej.com"
+#       ansible_password: "Emekulus@1234"
+#       ansible_connection: winrm
+#       ansible_winrm_transport: basic
+#       ansible_port: 5985
+#       ansible_winrm_server_cert_validation: ignore
+
+## Inventory file for HTTPS connection to DC.
+
+# all:
+#   hosts:
+#     Pumejlab:
+#       ansible_host: 192.168.1.107
+#       ansible_user: "Administrator@pumej.com"
+#       ansible_password: "Emekulus@1234"
+#       ansible_connection: winrm
+#       ansible_winrm_transport: basic
+#       ansible_port: 5986
+#       ansible_winrm_server_cert_validation: ignore
+
+## Inventory file for domain join operation and other ADDS related tasks.
+
+all:
+  children:
+    domain_controllers:
+      hosts:
+        Pumejlab:
+          ansible_host: 192.168.1.107
+          ansible_user: "Administrator@pumej.com"
+          ansible_password: "Emekulus@1234"
+          ansible_connection: winrm
+          ansible_port: 5986
+          ansible_winrm_transport: credssp
+
+    win_clients:
+      hosts:
+        Win10Client:
+          ansible_host: 192.168.1.104
+          ansible_user: Administrator
+          ansible_password: "Emekulus@1234"
+          ansible_connection: winrm
+          ansible_port: 5986
+          ansible_winrm_transport: credssp
+
+        Win11Client:
+          ansible_host: 192.168.1.104
+          ansible_user: Administrator
+          ansible_password: "Emekulus@1234"
+          ansible_connection: winrm
+          ansible_port: 5986
+          ansible_winrm_transport: credssp

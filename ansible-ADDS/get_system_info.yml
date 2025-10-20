@@ -1,0 +1,52 @@
+---
+- name: Gather comprehensive Windows system info
+  hosts: all
+  gather_facts: yes
+  tasks:
+
+    - name: Display Hostname
+      ansible.builtin.debug:
+        msg: "Hostname: {{ ansible_hostname }}"
+
+    - name: Display OS information
+      ansible.builtin.debug:
+        msg: "OS: {{ ansible_distribution }} {{ ansible_distribution_version }} ({{ ansible_os_family }})"
+
+    - name: Display Architecture
+      ansible.builtin.debug:
+        msg: "Architecture: {{ ansible_architecture }}"
+
+    - name: Display CPU info
+      ansible.builtin.debug:
+        msg: "CPU: {{ ansible_processor[0] | default('N/A') }} | Cores: {{ ansible_processor_cores | default('N/A') }} | Count: {{ ansible_processor_count | default('N/A') }}"
+
+    - name: Display Total RAM (MB)
+      ansible.builtin.debug:
+        msg: "Total RAM: {{ ansible_memtotal_mb | default('N/A') }} MB"
+
+    - name: Display Domain info
+      ansible.builtin.debug:
+        msg: "Domain: {{ ansible_domain | default('Not joined') }} | Domain Role: {{ ansible_domain_role | default('N/A') }}"
+
+    - name: Gather disk info using PowerShell
+      ansible.windows.win_shell: |
+        Get-PSDrive -PSProvider FileSystem | ForEach-Object {
+          $sizeGB = [math]::Round(($_.Used + $_.Free)/1GB, 2)
+          $usedGB = [math]::Round($_.Used/1GB, 2)
+          $freeGB = [math]::Round($_.Free/1GB, 2)
+          "{0}: Used {1} GB | Free {2} GB | Total {3} GB" -f $_.Name, $usedGB, $freeGB, $sizeGB
+        }
+      register: disk_facts
+
+    - name: Display disk info in human-readable format
+      ansible.builtin.debug:
+        msg: "{{ disk_facts.stdout_lines }}"
+
+    - name: Display logged-in users
+      ansible.windows.win_shell: query user
+      register: logged_in_users
+      ignore_errors: yes
+
+    - name: Show logged-in users
+      ansible.builtin.debug:
+        msg: "{{ logged_in_users.stdout_lines | default(['No users found']) }}"

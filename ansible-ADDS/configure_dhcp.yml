@@ -1,0 +1,29 @@
+---
+- name: Configure DHCP Server
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Install DHCP Server feature
+      ansible.windows.win_feature:
+        name: "DHCP"
+        state: present
+        include_management_tools: yes
+
+    - name: Add DHCP scope
+      community.windows.win_dhcp_scope:
+        name: "MainScope"
+        subnet: "192.168.50.0"
+        mask: "255.255.255.0"
+        start_range: "192.168.50.100"
+        end_range: "192.168.50.200"
+        lease_duration: "8.00:00:00"
+        state: present
+
+    - name: Set DNS option for DHCP scope
+      community.windows.win_dhcp_option:
+        scopeid: "192.168.50.0"
+        options:
+          - optionid: 6
+            value: ["192.168.50.103"]
+          - optionid: 15
+            value: ["pumej.com"]

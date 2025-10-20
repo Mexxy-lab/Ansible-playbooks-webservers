@@ -1,0 +1,16 @@
+---
+- name: Create a new Active Directory group
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Create security group for IT Staff
+      microsoft.ad.group:
+        name: "IT_group"
+        scope: global
+        category: security
+        path: "OU=IT organisation,OU=Employees,OU=PumejHQ,DC=pumej,DC=com"
+        description: "Group for IT department users"
+        state: present
+        domain_username: "Administrator"
+        domain_password: "Emekulus@1234"
+        domain_server: "pumejlab.pumej.com"

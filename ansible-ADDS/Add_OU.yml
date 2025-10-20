@@ -1,0 +1,15 @@
+---
+- name: Create a new Organizational Unit
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Create OU for new department
+      microsoft.ad.organizational_unit:
+        name: "Research"
+        path: "OU=Employees,OU=PumejHQ,DC=pumej,DC=com"
+        description: "Research Department"
+        protect_from_accidental_deletion: yes
+        state: present
+        domain_username: "Administrator"
+        domain_password: "Emekulus@1234"
+        domain_server: "pumejlab.pumej.com"

@@ -1,0 +1,24 @@
+---
+- name: Configure File Server and create a shared folder
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Install File Server role
+      ansible.windows.win_feature:
+        name: "FS-FileServer"
+        state: present
+        include_management_tools: yes
+
+    - name: Create shared folder
+      ansible.windows.win_file:
+        path: "C:\\SharedFiles"
+        state: directory
+
+    - name: Create a Windows file share
+      community.windows.win_share:
+        name: "SharedFiles"
+        path: "C:\\SharedFiles"
+        full: "Domain Admins"
+        change: "IT_Staff"
+        read: "Domain Users"
+        state: present
