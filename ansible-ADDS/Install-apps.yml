@@ -1,0 +1,73 @@
+---
+- name: Install Google Chrome on Windows machines
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Download Google Chrome installer
+      ansible.windows.win_get_url:
+        url: "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
+        dest: "C:\\Temp\\chrome_installer.exe"
+
+    - name: Install Google Chrome
+      ansible.windows.win_package:
+
+- name: Install VLC Media Player on Windows machines
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Download VLC Media Player installer
+      ansible.windows.win_get_url:
+        url: "https://get.videolan.org/vlc/3.0.11/win64/vlc-3.0.11-win64.exe"
+        dest: "C:\\Temp\\vlc_installer.exe"
+
+    - name: Install VLC Media Player
+      ansible.windows.win_package:
+
+- name: Install 7-Zip on Windows machines
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Download 7-Zip installer
+      ansible.windows.win_get_url:
+        url: "https://www.7-zip.org/a/7z1900-x64.exe"
+        dest: "C:\\Temp\\7zip_installer.exe"
+
+    - name: Install 7-Zip
+      ansible.windows.win_package:
+
+- name: Install Zoom on Windows machines
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Download Zoom installer
+      ansible.windows.win_get_url:
+        url: "https://zoom.us/client/latest/ZoomInstaller.exe"
+        dest: "C:\\Temp\\zoom_installer.exe"
+
+    - name: Install Zoom
+      ansible.windows.win_package:
+
+- name: Install office viewer on Windows machines
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Download Office Viewer installer
+      ansible.windows.win_get_url:
+        url: "https://download.microsoft.com/download/1/2/8/1285E3F2-1C3B-4D6D-8E2D-1C3F3D6F7E8A/OfficeViewer.exe"
+        dest: "C:\\Temp\\office_viewer_installer.exe"
+
+    - name: Install Office Viewer
+      ansible.windows.win_package:
+
+- name: Cleanup installers
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Remove installer files
+      ansible.windows.win_file:

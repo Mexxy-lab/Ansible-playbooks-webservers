@@ -11,7 +11,7 @@
 #       ansible_port: 5985
 #       ansible_winrm_server_cert_validation: ignore
 
-## Inventory file for HTTPS connection to DC.
+# Inventory file for HTTPS connection to DC.
 
 # all:
 #   hosts:
@@ -19,6 +19,17 @@
 #       ansible_host: 192.168.1.107
 #       ansible_user: "Administrator@pumej.com"
 #       ansible_password: "Emekulus@1234"
+#       ansible_connection: winrm
+#       ansible_winrm_transport: basic
+#       ansible_port: 5986
+#       ansible_winrm_server_cert_validation: ignore
+
+# all:
+#   hosts:
+#     Win11vm2:
+#       ansible_host: 192.168.1.110
+#       ansible_user: "pumej@yahoo.com"
+#       ansible_password: "Emekulus@2468"
 #       ansible_connection: winrm
 #       ansible_winrm_transport: basic
 #       ansible_port: 5986
@@ -36,22 +47,25 @@ all:
           ansible_password: "Emekulus@1234"
           ansible_connection: winrm
           ansible_port: 5986
-          ansible_winrm_transport: credssp
+          ansible_winrm_transport: basic
+          ansible_winrm_server_cert_validation: ignore
 
     win_clients:
       hosts:
-        Win10Client:
-          ansible_host: 192.168.1.104
-          ansible_user: Administrator
-          ansible_password: "Emekulus@1234"
+        Win11vm:
+          ansible_host: 192.168.1.110
+          ansible_user: "pumej@yahoo.com"
+          ansible_password: "Emekulus@2468"
           ansible_connection: winrm
           ansible_port: 5986
-          ansible_winrm_transport: credssp
+          ansible_winrm_transport: basic
+          ansible_winrm_server_cert_validation: ignore
 
-        Win11Client:
-          ansible_host: 192.168.1.104
-          ansible_user: Administrator
-          ansible_password: "Emekulus@1234"
+        Win11vm2:
+          ansible_host: 192.168.1.110
+          ansible_user: "pumej@yahoo.com"
+          ansible_password: "Emekulus@2468"
           ansible_connection: winrm
           ansible_port: 5986
-          ansible_winrm_transport: credssp
+          ansible_winrm_transport: basic
+          ansible_winrm_server_cert_validation: ignore
