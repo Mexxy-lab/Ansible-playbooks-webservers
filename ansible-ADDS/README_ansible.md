@@ -47,7 +47,7 @@ $store.Open("ReadWrite")
 $store.Add($cert)
 $store.Close()
 
-Test-WSMan -ComputerName Win11vm2 -Port 5986 -UseSSL                    | Used to test SSL connection 
+Test-WSMan -ComputerName Win11vm2 -Port 5986 -UseSSL                    | Used to test SSL connection. Sample output is shown below. 
 
 wsmid           : http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd
 ProtocolVersion : http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd
@@ -89,6 +89,24 @@ ansible-playbook -i inventory.yml domain_join.yml
 ansible -i inventory.yml win_clients -m win_ping                        | Should return ping for each clients 
 ansible -i inventory.yml win_clients -m win_command -a "hostname"       | Should return valid hostnames 
 ```
+## Implementing Ansible vault for secrete management
+
+- First create the vault.yml file using below command 
+- Populate the file with your username and passwords and create a secret password when prompted 
+- Update your inventory file with the right variables 
+- Run your playbook using the vault pass command
+
+```bash
+ansible-vault create vault.yml
+ansible-playbook -i inventory.yml get_system_info.yml --ask-vault-pass
+ansible -i inventory.yml win_clients -m win_ping --ask-vault-pass
+```
+
+
+
+
+
+
 
 ## Using Ansible to manage Exchange Admin Center on premise AD or Hybrid 
 
