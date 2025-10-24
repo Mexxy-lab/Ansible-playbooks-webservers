@@ -98,6 +98,7 @@ ansible -i inventory.yml win_clients -m win_command -a "hostname"       | Should
 
 ```bash
 ansible-vault create vault.yml
+ansible-vault edit vault.yml                                             | Used to edit or view the vault later.
 ansible-playbook -i inventory.yml get_system_info.yml --ask-vault-pass
 ansible -i inventory.yml win_clients -m win_ping --ask-vault-pass
 ```
