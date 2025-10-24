@@ -35,13 +35,16 @@ Port 5985 is the default port for WinRM over HTTP.
 ## Enable winrm on DC server - would set up HTTP connection on port 5986
 
 ```bash
+# Enable inbound ICMP (ping) requests
+Enable-NetFirewallRule -DisplayGroup "File and Printer Sharing"                                             | Used to enable ping on a windows machine
+
 $cert = New-SelfSignedCertificate -DnsName "Pumejlab" -CertStoreLocation Cert:\LocalMachine\My              | Used to create the Certificate
 $cert.Thumbprint
-New-Item -Path WSMan:\Localhost\Listener -Transport HTTPS -Address * -CertificateThumbprint "48C1DA81F81191DEE26759A98094E420757B0DBE" -Force
+New-Item -Path WSMan:\Localhost\Listener -Transport HTTPS -Address * -CertificateThumbprint "5D1DDFDB628118324EA07EB63D89C1AAEC99AE09" -Force
 netsh advfirewall firewall add rule name="WinRM" dir=in action=allow protocol=TCP localport=5985            | Used to allow port over firewall
 netsh advfirewall firewall add rule name="WinRM HTTPS" dir=in action=allow protocol=TCP localport=5986      | Used to allow port over firewall
 
-$cert = Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object {$_.Thumbprint -eq "48C1DA81F81191DEE26759A98094E420757B0DBE"}
+$cert = Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object {$_.Thumbprint -eq "5D1DDFDB628118324EA07EB63D89C1AAEC99AE09"}
 $store = New-Object System.Security.Cryptography.X509Certificates.X509Store("Root","LocalMachine")
 $store.Open("ReadWrite")
 $store.Add($cert)
@@ -53,22 +56,6 @@ wsmid           : http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xs
 ProtocolVersion : http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd
 ProductVendor   : Microsoft Corporation
 ProductVersion  : OS: 0.0.0 SP: 0.0 Stack: 3.0
-```
-
-OR 
-
-```bash
-# Generate a self-signed cert
-$cert = New-SelfSignedCertificate -DnsName "<hostname or IP>" -CertStoreLocation "Cert:\LocalMachine\My"
-
-# Create the WinRM listener
-winrm create winrm/config/Listener?Address=*+Transport=HTTPS "@{Hostname='Win11vm2'; CertificateThumbprint='$($cert.Thumbprint)'}"
-
-# Enable WinRM service and open firewall
-Set-Service WinRM -StartMode Automatic
-Start-Service WinRM
-Enable-PSRemoting -Force
-New-NetFirewallRule -DisplayName "WinRM HTTPS" -Name "WinRM-HTTPS" -Protocol TCP -LocalPort 5986 -Action Allow
 
 winrm enumerate winrm/config/Listener                                   | Would output the listener ports with certificates 
 ```
@@ -98,8 +85,8 @@ ansible -i inventory.yml win_clients -m win_command -a "hostname"       | Should
 
 ```bash
 ansible-vault create vault.yml
-ansible-vault edit vault.yml                                             | Used to edit or view the vault later.
-ansible-playbook -i inventory.yml get_system_info.yml --ask-vault-pass
+ansible-vault edit vault.yml                                                                | Used to edit or view the vault later.
+ansible all -i inventory.yml -m win_ping --extra-vars "@vault.yml" --ask-vault-pass         | Used to test with the encrypted password 
 ansible -i inventory.yml win_clients -m win_ping --ask-vault-pass
 ```
 

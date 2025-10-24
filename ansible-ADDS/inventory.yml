@@ -26,6 +26,17 @@
 
 # all:
 #   hosts:
+#     Win11vm:
+#       ansible_host: 192.168.1.109
+#       ansible_user: "pumej@yahoo.com"
+#       ansible_password: "Emekulus@2468"
+#       ansible_connection: winrm
+#       ansible_winrm_transport: basic
+#       ansible_port: 5985
+#       ansible_winrm_server_cert_validation: ignore
+
+# all:
+#   hosts:
 #     Win11vm2:
 #       ansible_host: 192.168.1.110
 #       ansible_user: "pumej@yahoo.com"
@@ -37,35 +48,61 @@
 
 ## Inventory file for domain join operation and other ADDS related tasks.
 
+# all:
+#   children:
+#     domain_controllers:
+#       hosts:
+#         Pumejlab:
+#           ansible_host: 192.168.1.107
+#           ansible_user: "Administrator@pumej.com"
+#           ansible_password: "Emekulus@1234"
+#           ansible_connection: winrm
+#           ansible_port: 5986
+#           ansible_winrm_transport: basic
+#           ansible_winrm_server_cert_validation: ignore
+
+#     win_clients:
+#       hosts:
+#         Win11vm:
+#           ansible_host: 192.168.1.109
+#           ansible_user: "pumej@yahoo.com"
+#           ansible_password: "Emekulus@2468"
+#           ansible_connection: winrm
+#           ansible_port: 5986
+#           ansible_winrm_transport: basic
+#           ansible_winrm_server_cert_validation: ignore
+
+#         Win11vm2:
+#           ansible_host: 192.168.1.110
+#           ansible_user: "pumej@yahoo.com"
+#           ansible_password: "Emekulus@2468"
+#           ansible_connection: winrm
+#           ansible_port: 5986
+#           ansible_winrm_transport: basic
+#           ansible_winrm_server_cert_validation: ignore
+
 all:
+  vars:
+    ansible_connection: winrm
+    ansible_winrm_transport: basic
+    ansible_port: 5986
+    ansible_winrm_scheme: https
+    ansible_winrm_server_cert_validation: ignore
+
   children:
-    domain_controllers:
+    Pumejlab:
       hosts:
-        Pumejlab:
-          ansible_host: 192.168.1.107
-          ansible_user: "Administrator@pumej.com"
-          ansible_password: "Emekulus@1234"
-          ansible_connection: winrm
-          ansible_port: 5986
-          ansible_winrm_transport: basic
-          ansible_winrm_server_cert_validation: ignore
+        192.168.1.107:
+          ansible_user: "{{ pumejlab_user }}"
+          ansible_password: "{{ pumejlab_password }}"
 
     win_clients:
       hosts:
-        Win11vm:
-          ansible_host: 192.168.1.110
-          ansible_user: "pumej@yahoo.com"
-          ansible_password: "Emekulus@2468"
-          ansible_connection: winrm
-          ansible_port: 5986
-          ansible_winrm_transport: basic
-          ansible_winrm_server_cert_validation: ignore
+        192.168.1.110:
+          ansible_user: "{{ winclient_admin_user }}"
+          ansible_password: "{{ winclient_admin_password }}"
+        192.168.1.109:
+          ansible_user: "{{ winclient_admin_user }}"
+          ansible_password: "{{ winclient_admin_password }}"
 
-        Win11vm2:
-          ansible_host: 192.168.1.110
-          ansible_user: "pumej@yahoo.com"
-          ansible_password: "Emekulus@2468"
-          ansible_connection: winrm
-          ansible_port: 5986
-          ansible_winrm_transport: basic
-          ansible_winrm_server_cert_validation: ignore
+
