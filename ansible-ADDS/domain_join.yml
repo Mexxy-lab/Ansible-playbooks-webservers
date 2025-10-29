@@ -2,12 +2,17 @@
 - name: Join Windows machine to AD domain
   hosts: win_clients
   tasks:
-    - win_domain_membership:
+    - name: Join the Windows machine to the domain
+      microsoft.ad.membership:
         dns_domain_name: pumej.com
-        domain_username: "Administrator@pumej.com"
-        domain_password: "Emekulus@1234"
+        domain_admin_user: "Administrator@pumej.com"
+        domain_admin_password: "Emekulus@1234"
         state: domain
       register: domain_state
 
-    - win_reboot:
-      when: domain_state.reboot_required
+- name: Reboot if required
+  win_reboot:
+    reboot_timeout: 1200
+  when: domain_state.reboot_required | default(false)
+  register: reboot_result
+

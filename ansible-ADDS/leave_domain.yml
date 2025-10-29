@@ -1,0 +1,17 @@
+---
+- name: Remove Windows machine from AD domain
+  hosts: win_clients
+  tasks:
+    - name: Leave the domain and join a workgroup
+      microsoft.ad.membership:
+        state: workgroup
+        workgroup_name: WORKGROUP   
+        domain_admin_user: "Administrator@pumej.com"   
+        domain_admin_password: "Emekulus@1234"    
+      register: leave_domain
+
+    - name: Reboot if required after leaving domain
+      win_reboot:
+        reboot_timeout: 1200
+      when: leave_domain.reboot_required | default(false)
+      register: reboot_result

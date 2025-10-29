@@ -37,14 +37,18 @@ Port 5985 is the default port for WinRM over HTTP.
 ```bash
 # Enable inbound ICMP (ping) requests
 Enable-NetFirewallRule -DisplayGroup "File and Printer Sharing"                                             | Used to enable ping on a windows machine
+winrm delete winrm/config/listener?Address=*+Transport=HTTPS                                                | Used to delete a previous cert listener
+
+Disable-NetAdapterBinding -Name "Ethernet" -ComponentID ms_tcpip6                                           | Would disable ipv6
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 192.168.1.103                        | Would set DNS to AD DS DC IP address 
 
 $cert = New-SelfSignedCertificate -DnsName "Pumejlab" -CertStoreLocation Cert:\LocalMachine\My              | Used to create the Certificate
 $cert.Thumbprint
-New-Item -Path WSMan:\Localhost\Listener -Transport HTTPS -Address * -CertificateThumbprint "5D1DDFDB628118324EA07EB63D89C1AAEC99AE09" -Force
+New-Item -Path WSMan:\Localhost\Listener -Transport HTTPS -Address * -CertificateThumbprint "2C999D07C084610A13622E8EC3AACA07E8F20474" -Force
 netsh advfirewall firewall add rule name="WinRM" dir=in action=allow protocol=TCP localport=5985            | Used to allow port over firewall
 netsh advfirewall firewall add rule name="WinRM HTTPS" dir=in action=allow protocol=TCP localport=5986      | Used to allow port over firewall
 
-$cert = Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object {$_.Thumbprint -eq "5D1DDFDB628118324EA07EB63D89C1AAEC99AE09"}
+$cert = Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object {$_.Thumbprint -eq "2C999D07C084610A13622E8EC3AACA07E8F20474"}
 $store = New-Object System.Security.Cryptography.X509Certificates.X509Store("Root","LocalMachine")
 $store.Open("ReadWrite")
 $store.Add($cert)
@@ -71,7 +75,7 @@ ansible-playbook -i inventory.yml create_group.yml
 ansible-playbook -i inventory.yml configure_dns.yml
 ansible-playbook -i inventory.yml configure_dhcp.yml
 ansible-playbook -i inventory.yml configure_file_server.yml
-ansible-playbook -i inventory.yml domain_join.yml
+ansible-playbook -i inventory.yml domain_join.yml --extra-vars "@vault.yml" --ask-vault-pass
 
 ansible -i inventory.yml win_clients -m win_ping                        | Should return ping for each clients 
 ansible -i inventory.yml win_clients -m win_command -a "hostname"       | Should return valid hostnames 
@@ -89,11 +93,6 @@ ansible-vault edit vault.yml                                                    
 ansible all -i inventory.yml -m win_ping --extra-vars "@vault.yml" --ask-vault-pass         | Used to test with the encrypted password 
 ansible -i inventory.yml win_clients -m win_ping --ask-vault-pass
 ```
-
-
-
-
-
 
 
 ## Using Ansible to manage Exchange Admin Center on premise AD or Hybrid 
@@ -241,6 +240,7 @@ sudo nano /etc/resolv.conf
     #nameserver 8.8.8.8
 
 sudo chattr +i /etc/resolv.conf                     | Used to make sure Network manager can't modify it. 
+sudo chattr -i /etc/resolv.conf                     | Used to make the file rewritable again 
 ```
 
 - You know the domain admin account (e.g., Administrator@pumej.com) for joining.
