@@ -10,9 +10,9 @@
         state: domain
       register: domain_state
 
-- name: Reboot if required
-  win_reboot:
-    reboot_timeout: 1200
-  when: domain_state.reboot_required | default(false)
-  register: reboot_result
+    - name: Reboot if required
+      win_reboot:
+        reboot_timeout: 1200
+      when: domain_state.reboot_required | default(false)
+      register: reboot_result
 

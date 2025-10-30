@@ -1,13 +1,27 @@
 ---
-- name: Remove Windows machine from AD domain
+- name: Remove Windows machines from AD domain and clean up AD
   hosts: win_clients
+  gather_facts: true
+  vars:
+    domain_admin_user: "Administrator@pumej.com"
+    domain_admin_password: "Emekulus@1234"
+
   tasks:
+    - name: Get the computer's hostname before leaving the domain
+      win_shell: |
+        $env:COMPUTERNAME
+      register: hostname_result
+
+    - name: Set fact for computer name
+      set_fact:
+        computer_name: "{{ hostname_result.stdout | trim }}"
+
     - name: Leave the domain and join a workgroup
       microsoft.ad.membership:
         state: workgroup
-        workgroup_name: WORKGROUP   
-        domain_admin_user: "Administrator@pumej.com"   
-        domain_admin_password: "Emekulus@1234"    
+        workgroup_name: WORKGROUP
+        domain_admin_user: "{{ domain_admin_user }}"
+        domain_admin_password: "{{ domain_admin_password }}"
       register: leave_domain
 
     - name: Reboot if required after leaving domain
@@ -15,3 +29,19 @@
         reboot_timeout: 1200
       when: leave_domain.reboot_required | default(false)
       register: reboot_result
+
+    - name: Remove the computer object from Active Directory
+      delegate_to: "{{ groups['Pumejlab'][0] }}"
+      win_shell: |
+        Import-Module ActiveDirectory
+        $computerName = "{{ computer_name }}"
+        if (Get-ADComputer -Identity $computerName -ErrorAction SilentlyContinue) {
+            Remove-ADComputer -Identity $computerName -Confirm:$false
+            Write-Host "✅ Deleted computer object: $computerName"
+        } else {
+            Write-Host "⚠️ Computer object not found: $computerName"
+        }
+
+
+
+
